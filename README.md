@@ -85,32 +85,3 @@ GET /analytics/region/{h3_index}
 Returns number of users inside that H3 cell.
 
 This allows scalable geographic analytics without storing raw coordinates.
-
-# System Features
-
-  User Registration with location  
-  Help Request Creation (Needy only)  
-  Request Verification (Admin only)  
-  Regional Analytics via H3  
-  Event-driven Audit Logging  
-  SQLite Database  
-
-# Event-Driven Architecture
-
-The system includes an event queue:
-
-- User registration generates event
-- Request verification generates event
-- Events are processed asynchronously
-- Audit logs are stored in database
-
-This simulates a simple event-driven system.
-
-# Database Tables
-
-users  
-help_requests  
-audit_logs  
-
-SQLite database file: azhar.db
-
