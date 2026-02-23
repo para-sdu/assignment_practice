@@ -60,28 +60,97 @@ X-User-Role: needy
 
 Unauthorized access returns HTTP 403.
 
-# How H3 Is Used in the System
+# H3 Geospatial Integration (Detailed Explanation)
 
-The system uses Uber’s H3 geospatial indexing library.
+The system integrates Uber's H3 geospatial indexing library.
+
+H3 is a hexagonal hierarchical geospatial indexing system.  
+Instead of storing raw latitude and longitude coordinates for analytics, the system converts geographic coordinates into a unique H3 hexagonal cell index.
+
+## How H3 Works in This System
 
 When a user registers:
-- Latitude and Longitude are provided.
-- They are converted into an H3 index at resolution 7.
-- The H3 index is stored in the database.
 
-Example:
-h3.geo_to_h3(lat, lon, 7)
+1. The user provides:
+   - Latitude
+   - Longitude
 
-This enables:
+2. The system converts coordinates into an H3 index using:
 
-  Regional clustering  
-  Location-based analytics  
-  Counting users inside same hexagonal grid  
+   h3.geo_to_h3(lat, lon, 7)
+
+3. Resolution level 7 is used:
+   - Medium geographic precision
+   - Good balance between detail and performance
+
+4. The generated H3 index is stored in the database inside the `users` table.
+
+## Why H3 Is Used
+
+H3 allows:
+
+  Efficient geographic clustering  
+  Fast region-based queries  
+  Scalable analytics  
+  Grouping users by hexagonal grid instead of raw coordinates  
+  Avoiding complex radius-based SQL queries  
+
+## Regional Analytics
 
 Endpoint:
 
 GET /analytics/region/{h3_index}
 
-Returns number of users inside that H3 cell.
+This endpoint:
+- Takes an H3 index as input
+- Counts all users stored in that hexagonal cell
+- Returns total users in that geographic region
 
-This allows scalable geographic analytics without storing raw coordinates.
+This enables:
+
+- Regional statistics
+- Heatmap generation (future extension)
+- Identifying high-demand charity areas
+- Location-based decision making
+  
+## Why H3 Is Better Than Raw Coordinates
+
+Without H3:
+- Complex distance calculations
+- Slower queries
+- Harder clustering
+
+With H3:
+- Simple string comparison
+- Fast SQL filtering
+- Hierarchical indexing support
+- Easy aggregation
+
+This makes the system scalable and geo-analytics ready.
+
+# System Endpoints
+
+### 1.Register User
+POST /users/register
+
+Stores user with H3 index.
+
+### 2.Create Help Request
+POST /requests/create
+
+Recipient only.
+
+### 3.Verify Help Request
+PATCH /requests/verify/{req_id}
+
+Admin only.
+
+### 4.Regional Analytics
+GET /analytics/region/{h3_index}
+
+Returns number of users in region.
+
+### 5.View System Logs
+GET /system/logs
+
+Admin only.
