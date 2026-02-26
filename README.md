@@ -17,7 +17,7 @@ pip install fastapi uvicorn sqlalchemy h3
 
 ## 2.Run the Application
 
-uvicorn main:app --reload
+uvicorn assignment1:app --reload
 
 ## 3.Open API Documentation
 
